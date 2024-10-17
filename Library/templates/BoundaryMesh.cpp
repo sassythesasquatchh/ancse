@@ -30,16 +30,19 @@ std::pair<BoundaryMesh, Eigen::MatrixXi> BoundaryMesh::uniformRefine() const {
 BoundaryMesh::BoundaryMesh(const coord_matrix_t& coords,
                            const elem_matrix_t& elems) {
   // TODO: implement the constructor
+  coordinates_ = coords;
+  elements_ = elems;
+  isInitialized_ = 1;
 }
 
 //------------------------------------------------------------------------------
 int BoundaryMesh::numVertices() const {  // TODO: Implement the function
-  return -1;
+  return coordinates_.rows();
 };
 
 //------------------------------------------------------------------------------
 int BoundaryMesh::numElements() const {  // TODO: Implement the function
-  return -1;
+  return elements_.rows();
 };
 
 //------------------------------------------------------------------------------
@@ -47,8 +50,7 @@ BoundaryMesh::coord_matrix_t BoundaryMesh::getMeshVertices() const {
   assert(isInitialized_);
   // TODO: implement the function
 
-  BoundaryMesh::coord_matrix_t out;
-  return out;
+  return coordinates_;
 };
 
 //------------------------------------------------------------------------------
@@ -56,15 +58,17 @@ BoundaryMesh::elem_matrix_t BoundaryMesh::getMeshElements() const {
   assert(isInitialized_);
   // TODO: implement the function
 
-  BoundaryMesh::elem_matrix_t out;
-  return out;
+  return elements_;
 };
 
 //------------------------------------------------------------------------------
 Eigen::Vector2d BoundaryMesh::getVertex(int i) const {
   assert(isInitialized_);
+  // Ensure that the vertex index is not out of bounds
+  assert(i < coordinates_.rows());
   // TODO: implement the function
-  return Eigen::Vector2d(0, 0);
+  // Return the i-th row of the coordinates matrix
+  return coordinates_.row(i);
 };
 
 //------------------------------------------------------------------------------
@@ -72,16 +76,26 @@ std::pair<Eigen::Vector2d, Eigen::Vector2d> BoundaryMesh::getElementVertices(
     int i) const {
   assert(isInitialized_);
   // TODO: implement the function
+  // Ensure that the element index is not out of bounds
+  assert(i < elements_.rows());
 
-  return std::make_pair(Eigen::Vector2d(0, 0), Eigen::Vector2d(0, 0));
+  // Get the first and second vertex idxs (row idxs) of the i-th element
+  auto first_vertex_idx = elements_(i, 0);
+  auto second_vertex_idx = elements_(i, 1);
+  // Get the corresponding vertices
+  return std::make_pair(coordinates_.row(first_vertex_idx), coordinates_.row(second_vertex_idx));
 };
 
 //------------------------------------------------------------------------------
 int BoundaryMesh::getElementVertex(int i, int j) const {
   assert(isInitialized_);
   // TODO: implement the function
-
-  return -1;
+  // Ensure that the element index is not out of bounds
+  assert(i < elements_.rows());
+  // Each element has only 2 vertices
+  assert(j < 2);
+  // Return the corresponding vertex
+  return _elements(i, j);
 };
 
 //------------------------------------------------------------------------------
