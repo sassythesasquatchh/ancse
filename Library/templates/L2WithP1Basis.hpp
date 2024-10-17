@@ -31,7 +31,7 @@ Eigen::VectorXd L2WithP1Basis(FUNC f, BoundaryMesh& mesh) {
     double integral1 = 0, integral2 = 0;
     // Quadrature loop
     for (int pt = 0; pt < order; ++pt) {
-      // t is the quadrature point, W[pt] is the corresponding quadrature weight
+      // t is the quadrature point on the reference element, W[pt] is the corresponding quadrature weight
       double t = X[pt];
 
       // The following equations arise from the RHS integral.
@@ -40,7 +40,7 @@ Eigen::VectorXd L2WithP1Basis(FUNC f, BoundaryMesh& mesh) {
       // This transformation introduces the factor 0.5 * h. 
       // By subsituting x = gamma(t) (where gamma(t) is the parametrisation of the 
       // element), we get f(gamma(t)) for the RHS function and 0.5*(1-t), 0.5*(1+t)
-      // for the first and second local shape functions on the reference element.
+      // for the first and second local shape functions, respectively, on the reference element.
 
       // Integral of the reference local shape function that slopes down from 
       // one at the first vertex to zero at the second vertex

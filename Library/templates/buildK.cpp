@@ -57,14 +57,14 @@ void computeK(Eigen::MatrixXd &K, const BoundaryMesh &mesh, double eta) {
       // The is because the vector from a point on one panel to a point on the other panel is
       // always perpendicular to the normal vector of either panel (importantly here, the second
       // panel). Therefore the dot product in the numerator is 0 for all pairs of points in the set
-      // panel X panel'
+      // panel_i X panel_j.
 
       // If the panels are parallel, then 
       // (j_first_vertex - i_first_vertex) = c*(j_second_vertex - j_first_vertex)
       // and
       // (j_first_vertex - i_second_vertex) = c*(j_second_vertex - j_first_vertex)
       // where c is some constant. Forming equations in the x and y coordinates and substituting
-      // leads to the following equations, that are zero iff the panels are parallel.
+      // leads to the following equations, which are zero iff the panels are parallel.
       double lindep1 = fabs((j_first_vertex - i_first_vertex)[0] * (j_second_vertex - j_first_vertex)[1] - (j_first_vertex - i_first_vertex)[1] * (j_second_vertex - j_first_vertex)[0]);
       double lindep2 = fabs((j_first_vertex - i_second_vertex)[0] * (j_second_vertex - j_first_vertex)[1] - (j_first_vertex - i_second_vertex)[1] * (j_second_vertex - j_first_vertex)[0]);
 
@@ -82,9 +82,9 @@ void computeK(Eigen::MatrixXd &K, const BoundaryMesh &mesh, double eta) {
       // TODO:
       // Local to global mapping to populate the Galerkin matrix K
 
-      // The interaction matrix is 2x1, because the the Dirichlet data is approximated
+      // The local interaction matrix is 2x1, because the trial space (H^1/2) is approximated
       // by the S^0_1 space with a tent function basis (support over two elements) and
-      // the Neumann data is approximated by the S^-1_0 space with a characteristic
+      // the test space (H^-1/2) is approximated by the S^-1_0 space with a characteristic
       // function basis (support over one element).
 
       // A linear combination is used, because I0 and I1 are calculated with unusual 
@@ -105,6 +105,18 @@ void computeK(Eigen::MatrixXd &K, const BoundaryMesh &mesh, double eta) {
       // NB. This is the local shape function that slopes up from 0 at the first vertex
       // of i to 1 at the second vertex of i.
       K(j, i_second_idx) += I0 + I1;
+
+      // If we were discretizing the single layer boundary intergral operator instead, the local
+      // interaction matrix would be 1x1 (a scalar) because the trial and test spaces would both be
+      // H^-1/2 and therefore approximated to lowest degree by the S^-1_0 space. Therefore, each panel would only have one 
+      // associated basis function, and only one double integral has to be evaluated for each pair.
+      // An implementation may look something like:
+      // W(j, i) = computeWij(eta, j_first_vertex, j_second_vertex, i_first_vertex, i_second_vertex);
+
+      // Another change is that we would remove the conditional statement checking for parallel panels,
+      // because there is no dot product in the numerator of the integrand for the single layer operator.
+      // Therefore, the integrand is in general non-zero for pairs of parallel panels.
+      }
     }  // endfor
   }  // endfor
 }
